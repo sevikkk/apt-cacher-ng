@@ -1,0 +1,8 @@
+build-essential
+cmake
+zlib1g-dev
+libbz2-dev
+liblzma-dev
+libssl-dev
+libboost-dev
+libwrap0-dev

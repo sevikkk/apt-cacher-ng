@@ -53,8 +53,18 @@ bool open()
 void transfer(char cLogType, uint64_t nCount, const char *szClient, const char *szPath)
 {
 	lockguard g(&mx);
+
+	if(acfg::debug & LOG_CONSOLE) {
+		cout << time(0) << '|' << cLogType << '|' << nCount;
+		if(acfg::verboselog)
+			cout << '|' << szClient << '|' << szPath;
+		cout << endl;
+		cout.flush();
+	};
+
 	if(!fStat.is_open())
 		return;
+
 	fStat << time(0) << '|' << cLogType << '|' << nCount;
 	if(acfg::verboselog)
 		fStat << '|' << szClient << '|' << szPath;
@@ -62,9 +72,16 @@ void transfer(char cLogType, uint64_t nCount, const char *szClient, const char *
 	if(acfg::debug&LOG_FLUSH) fStat.flush();
 }
 
+
 void misc(const string & sLine, const char cLogType)
 {
 	lockguard g(&mx);
+
+	if(acfg::debug & LOG_CONSOLE) {
+		cout << time(0) << '|' << cLogType << '|' << sLine << endl;
+		cout.flush();
+	};
+
 	if(!fStat.is_open())
 		return;
 
@@ -72,34 +89,34 @@ void misc(const string & sLine, const char cLogType)
 	
 	if(acfg::debug&LOG_FLUSH)
 		fStat.flush();
+
 }
 
 void err(const char *msg, const char *client)
 {
 	lockguard g(&mx);
 
-	if(!fErr.is_open())
-	{
-/*#ifdef DEBUG
-		cerr << msg <<endl;
-#endif
-*/
-		return;
-	}
-	
 	static char buf[32];
 	const time_t tm=time(NULL);
 	ctime_r(&tm, buf);
 	buf[24]=0;
+
+	if(acfg::debug & LOG_CONSOLE) {
+		cerr << buf << '|';
+		if(client)
+			cerr << client << ": ";
+		cerr << msg << endl;
+		cerr.flush();
+	};
+
+
+	if(!fErr.is_open())
+		return;
+
 	fErr << buf << '|';
 	if(client)
 		fErr << client << ": ";
 	fErr << msg << '\n';
-
-#ifdef DEBUG
-	if(acfg::debug & LOG_DEBUG)
-		cerr << buf << msg <<endl;
-#endif
 
 	if(acfg::debug & LOG_DEBUG)
 		fErr.flush();

@@ -8,6 +8,7 @@
 #define LOG_FLUSH 1
 #define LOG_MORE 2
 #define LOG_DEBUG 4
+#define LOG_CONSOLE 8
 
 
 #ifdef DEBUG
